@@ -118,3 +118,47 @@ export interface ProcurementAgentAPIResponse {
         timestamp: string;
     };
 }
+
+
+export interface AgentTestVector {
+  id: string;
+  input: {
+    component_type: string;
+    power: string;
+    protection: string;
+    standards: string[];
+    region: string;
+    industry: string;
+    priorities: {
+      price: number;
+      quality: number;
+      delivery: number;
+    };
+  };
+  output: {
+    success: boolean;
+    suppliers_overview: {
+      total_found: number;
+      compliant_count: number;
+      non_compliant_count: number;
+    };
+    recommendation: {
+      top_supplier: string;
+      score: number;
+      justification: string;
+      trade_offs: string;
+    };
+    price_analysis: {
+      min: number;
+      max: number;
+      average?: number;
+      spread_percent: number;
+      currency: string;
+    };
+    compliance?: { supplier_name: string; verdict: string }[];
+    risk_summary?: { supplier_name: string; risk_level: string }[];
+    market_insights?: string[];
+    rejection_reasons?: { supplier_name: string; reason: string }[];
+    scores?: { supplier_name: string; score: number; price?: number }[];
+  };
+}

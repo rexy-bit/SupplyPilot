@@ -4,8 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 const links = [
   { href: "#hero",       label: "About" },
   { href: "#how",        label: "How it works" },
+  { href: "#examples",    label: "Examples" },
+  { href: "#try",    label: "Try It" },
   { href: "#demo",       label: "Live demo" },
-  { href: "#results",    label: "Results" },
   { href: "#features",   label: "Features" },
   { href: "#use-cases",  label: "Use cases" },
   { href: "#limitation", label: "Limitations" },
@@ -56,7 +57,7 @@ const Header = () => {
       </a>
 
       {/* Desktop nav */}
-      <nav className="hidden lg:flex items-center gap-0.5">
+      <nav className="hidden min-[1201px]:flex items-center gap-0.5">
         {links.map(({ href, label }) => (
           <a
             key={href}
@@ -74,7 +75,7 @@ const Header = () => {
       </nav>
 
       {/* Desktop right */}
-      <div className="hidden lg:flex items-center gap-2.5">
+      <div className="hidden min-[1201px]:flex items-center gap-2.5">
         <span className="font-mono text-[10px] tracking-[.05em] text-white/35
           flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400
@@ -91,7 +92,7 @@ const Header = () => {
       </div>
 
       {/* Mobile right */}
-      <div className="flex lg:hidden items-center gap-2" ref={menuRef}>
+      <div className="flex min-[1201px]:hidden items-center gap-2" ref={menuRef}>
         <a href="#demo"
           className="text-[11px] font-medium text-white px-3 py-1.5 rounded-[7px]
           bg-blue-700/80 border border-blue-500/40">

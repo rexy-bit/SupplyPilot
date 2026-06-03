@@ -4,56 +4,125 @@ import Supplier from "../models/supplier.model.js";
 import Quote from "../models/quote.model.js";
 
 const suppliers = [
-    {
-        name: "ABB Motors",
-        country: "Germany",
-        rating: 4.8,
-        certifications: ["CE", "IEC", "ISO9001"],
-        components: ["electric_motor", "drive", "transformer"],
-        avg_delivery_days: 7,
-        warranty_years: 2,
-        price_range: { min: 1100, max: 1400 }
-    },
-    {
-        name: "Siemens Industry",
-        country: "Germany",
-        rating: 4.9,
-        certifications: ["CE", "IEC", "ISO9001", "UL"],
-        components: ["electric_motor", "plc", "sensor"],
-        avg_delivery_days: 10,
-        warranty_years: 3,
-        price_range: { min: 1300, max: 1700 }
-    },
-    {
-        name: "WEG Europe",
-        country: "Brazil",
-        rating: 4.5,
-        certifications: ["CE", "IEC"],
-        components: ["electric_motor"],
-        avg_delivery_days: 15,
-        warranty_years: 2,
-        price_range: { min: 950, max: 1200 }
-    },
-    {
-        name: "Leroy-Somer",
-        country: "France",
-        rating: 4.6,
-        certifications: ["CE", "IEC", "ISO9001"],
-        components: ["electric_motor", "generator"],
-        avg_delivery_days: 5,
-        warranty_years: 2,
-        price_range: { min: 1050, max: 1350 }
-    },
-    {
-        name: "ElectroParts DZ",
-        country: "Algeria",
-        rating: 3.9,
-        certifications: ["CE"],
-        components: ["electric_motor"],
-        avg_delivery_days: 3,
-        warranty_years: 1,
-        price_range: { min: 800, max: 1050 }
-    }
+   {
+    name: "Schneider Electric",
+    country: "France",
+    rating: 4.8,
+    certifications: ["CE", "IEC", "ISO9001"],
+    components: ["electric_motor", "sensor", "drive", "plc"],
+    avg_delivery_days: 6,
+    warranty_years: 3,
+    price_range: { min: 1200, max: 1600 }
+},
+{
+    name: "Rockwell Automation",
+    country: "USA",
+    rating: 4.7,
+    certifications: ["UL", "NEMA", "ISO9001"],
+    components: ["plc", "drive", "sensor"],
+    avg_delivery_days: 12,
+    warranty_years: 3,
+    price_range: { min: 1400, max: 1800 }
+},
+{
+    name: "Mitsubishi Electric",
+    country: "Japan",
+    rating: 4.9,
+    certifications: ["CE", "IEC", "ISO9001"],
+    components: ["electric_motor", "drive", "sensor"],
+    avg_delivery_days: 9,
+    warranty_years: 3,
+    price_range: { min: 1250, max: 1650 }
+},
+{
+    name: "Yaskawa Electric",
+    country: "Japan",
+    rating: 4.8,
+    certifications: ["CE", "IEC"],
+    components: ["electric_motor", "drive"],
+    avg_delivery_days: 8,
+    warranty_years: 2,
+    price_range: { min: 1150, max: 1500 }
+},
+{
+    name: "Bosch Rexroth",
+    country: "Germany",
+    rating: 4.7,
+    certifications: ["CE", "ISO9001"],
+    components: ["hydraulic_pump", "gearbox", "drive"],
+    avg_delivery_days: 10,
+    warranty_years: 2,
+    price_range: { min: 1300, max: 1750 }
+},
+{
+    name: "Hitachi Industrial Components",
+    country: "Japan",
+    rating: 4.6,
+    certifications: ["CE", "IEC", "ISO9001"],
+    components: ["electric_motor", "transformer"],
+    avg_delivery_days: 11,
+    warranty_years: 3,
+    price_range: { min: 1100, max: 1500 }
+},
+{
+    name: "Emerson Electric",
+    country: "USA",
+    rating: 4.7,
+    certifications: ["UL", "ISO9001"],
+    components: ["sensor", "valve", "compressor"],
+    avg_delivery_days: 13,
+    warranty_years: 3,
+    price_range: { min: 1000, max: 1400 }
+},{
+    name: "General Electric (GE Grid Solutions)",
+    country: "USA",
+    rating: 4.7,
+    certifications: ["UL", "ISO9001", "CE"],
+    components: ["transformer", "power_transformer", "sensor"],
+    avg_delivery_days: 14,
+    warranty_years: 3,
+    price_range: { min: 1500, max: 2000 }
+},
+{
+    name: "Eaton Corporation",
+    country: "USA",
+    rating: 4.6,
+    certifications: ["UL", "NEMA", "ISO9001"],
+    components: ["electric_motor", "circuit_breaker", "drive"],
+    avg_delivery_days: 11,
+    warranty_years: 3,
+    price_range: { min: 1300, max: 1700 }
+},
+{
+    name: "Danfoss",
+    country: "Denmark",
+    rating: 4.7,
+    certifications: ["CE", "IEC", "ISO9001"],
+    components: ["electric_motor", "valve", "compressor", "drive"],
+    avg_delivery_days: 8,
+    warranty_years: 2,
+    price_range: { min: 1200, max: 1550 }
+},
+{
+    name: "Bonfiglioli",
+    country: "Italy",
+    rating: 4.5,
+    certifications: ["CE", "ISO9001"],
+    components: ["gearbox", "electric_motor", "drive"],
+    avg_delivery_days: 6,
+    warranty_years: 2,
+    price_range: { min: 1000, max: 1350 }
+},
+{
+    name: "Nidec Corporation",
+    country: "Japan",
+    rating: 4.8,
+    certifications: ["CE", "IEC", "ISO9001"],
+    components: ["electric_motor", "compressor", "sensor"],
+    avg_delivery_days: 9,
+    warranty_years: 3,
+    price_range: { min: 1150, max: 1600 }
+}
 ];
 
 export const seedDatabase = async () => {

@@ -37,7 +37,9 @@ const HowItWorks = () => {
   }, []);
 
   return (
-    <section className="w-full flex flex-col items-center py-24 px-6">
+    <section 
+    id="how"
+    className="w-full flex flex-col items-center py-24 px-6">
 
       {/* Eyebrow */}
       <p className="font-mono text-[11px] tracking-[.12em] uppercase text-gray-500 mb-3">

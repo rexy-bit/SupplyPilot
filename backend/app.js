@@ -21,6 +21,7 @@ app.use('/api/agent', agentRouter);
 const startServer = async () => {
     try {
         await connectToDatabase();
+       // await seedDatabase(); // Optionnel : pour pré-remplir la base de données avec des données de test
         app.listen(PORT, () => {
             console.log(`App running on : http://localhost:${PORT}`);
         });

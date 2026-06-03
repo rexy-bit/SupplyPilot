@@ -8,7 +8,8 @@ interface AgentContextType{
     agentResponse : ProcurementAgentAPIResponse | null;
     loadingAgentResponse: boolean;
     getAgentResponse : (procurementDetails : string )=>Promise<void>;
-    
+    setAgentResponse: (r: ProcurementAgentAPIResponse | null) => void;
+setLoadingAgentResponse: (b: boolean) => void;
 
 }
 
@@ -54,8 +55,8 @@ export const AgentProvider = ({children} : {children: React.ReactNode}) => {
                 throw new Error(data.error ||data.message || "Error in getting agent response");
             }
 
-            console.log("agent data: ",data);
-            setAgentResponse(data);
+            console.log("agent data: ",data.data);
+            setAgentResponse(data.data);
 
         } catch (error) {
             console.error("Error fetching agent response:", error);
@@ -66,7 +67,7 @@ export const AgentProvider = ({children} : {children: React.ReactNode}) => {
 
 
     return  <AgentContext.Provider 
-    value={{agentResponse, loadingAgentResponse, getAgentResponse}}>
+    value={{agentResponse, loadingAgentResponse, getAgentResponse, setAgentResponse, setLoadingAgentResponse}}>
         {children}
     </AgentContext.Provider>
 }

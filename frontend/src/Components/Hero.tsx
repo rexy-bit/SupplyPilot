@@ -71,6 +71,7 @@ const Hero = () => {
                 >
                     <motion.a
                         whileHover={{ scale: 1.05 }}
+                        href="#demo"
                         whileTap={{ scale: 0.97 }}
                         className="bg-blue-600 text-white rounded-md px-5 py-3 font-semibold shadow-lg cursor-pointer"
                     >
@@ -79,10 +80,11 @@ const Hero = () => {
 
                     <motion.a
                         whileHover={{ scale: 1.05 }}
+                         href="#how"
                         whileTap={{ scale: 0.97 }}
                         className="bg-white text-gray-900 rounded-md px-5 py-3 font-semibold cursor-pointer"
                     >
-                        View Demo
+                        View Details
                     </motion.a>
                 </motion.div>
             </motion.div>
