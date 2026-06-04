@@ -309,7 +309,7 @@ export async function runProcurementAgent(userMessage) {
         generationConfig: {
             temperature: 0.2,
             topP: 0.8,
-            maxOutputTokens: 4096   // increased for richer structured JSON
+            maxOutputTokens: 8192    // increased for richer structured JSON
         }
     });
 
@@ -346,14 +346,19 @@ export async function runProcurementAgent(userMessage) {
 
             // Parse structured JSON from Gemini
             let structuredAnalysis = null;
-            try {
-                const clean = rawText.replace(/```json|```/g, "").trim();
-                structuredAnalysis = JSON.parse(clean);
-                console.log("\n📋 Structured analysis parsed successfully");
-            } catch (e) {
-                console.warn("⚠️  Could not parse structured JSON — storing raw text");
-                structuredAnalysis = { raw: rawText };
-            }
+        try {
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("No JSON object found");
+    
+    structuredAnalysis = JSON.parse(jsonMatch[0]);
+    console.log("\n📋 Structured analysis parsed successfully");
+    console.log("   Keys found:", Object.keys(structuredAnalysis));
+} catch (e) {
+    console.error("⚠️  Parse error:", e.message);
+    console.error("⚠️  rawText length:", rawText.length);
+    console.error("⚠️  rawText end (last 300 chars):", rawText.slice(-300)); // ← fin du texte
+    structuredAnalysis = { raw: rawText };
+}
 
             // Procurement scores (computed locally, not by Gemini)
             let scores = [];

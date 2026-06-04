@@ -11,6 +11,8 @@ import UseCases from './Components/UseCases'
 import Limitations from './Components/Limitations'
 import RoadMap from './Components/RoadMap'
 import Me from './Components/Me'
+import BuiltWith from './Components/BuiltWith'
+import Footer from './Components/Footer'
 
 function App() {
   
@@ -31,6 +33,8 @@ function App() {
         <Limitations/>
         <RoadMap/>
         <Me/>
+        <BuiltWith/>
+        <Footer/>
     </>
     </AgentProvider>
   )

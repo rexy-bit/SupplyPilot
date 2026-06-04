@@ -25,7 +25,6 @@ export const AgentProvider = ({children} : {children: React.ReactNode}) => {
         return saved ? JSON.parse(saved) : null;
     });
 
-
     useEffect(()=>{
         localStorage.setItem('agentResponse', JSON.stringify(agentResponse));
     }, [agentResponse]);
