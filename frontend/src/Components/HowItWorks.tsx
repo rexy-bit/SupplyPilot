@@ -1,11 +1,48 @@
 import { memo, useEffect, useRef, useState } from "react";
 
 const steps = [
-  { icon: "🔍", tag: "MongoDB",    title: "Supplier search",        desc: "Query the database to find suppliers matching your technical requirements." },
-  { icon: "💰", tag: "Analysis",   title: "Price comparison",       desc: "Analyze quotes, calculate averages, and detect market anomalies." },
-  { icon: "📜", tag: "Compliance", title: "Certification check",    desc: "Verify compliance with CE, IEC, ISO, UL and industry standards." },
-  { icon: "⚠️", tag: "Risk",       title: "Risk analysis",          desc: "Evaluate geopolitical, delivery, and supplier reliability risks." },
-  { icon: "🏆", tag: "Output",     title: "Final recommendation",   desc: "Generate a ranked supplier list with a procurement score." },
+  {
+    icon: "🔍",
+    tag: "MongoDB",
+    title: "Supplier search",
+    desc: "Query the database to find suppliers matching your technical requirements.",
+    isNew: false,
+  },
+  {
+    icon: "🌐",
+    tag: "Web scraping",
+    title: "Live web discovery",
+    desc: "Tavily search + Cheerio scraping extracts real supplier data (name, country, certs, delivery) directly from manufacturer websites. New suppliers are saved to MongoDB automatically.",
+    isNew: true,
+  },
+  {
+    icon: "💰",
+    tag: "Analysis",
+    title: "Price comparison",
+    desc: "Analyze quotes, calculate averages, and detect market anomalies.",
+    isNew: false,
+  },
+  {
+    icon: "📜",
+    tag: "Compliance",
+    title: "Certification check",
+    desc: "Verify compliance with CE, IEC, ISO, UL and industry standards.",
+    isNew: false,
+  },
+  {
+    icon: "⚠️",
+    tag: "Risk",
+    title: "Risk analysis",
+    desc: "Evaluate geopolitical, delivery, and supplier reliability risks.",
+    isNew: false,
+  },
+  {
+    icon: "🏆",
+    tag: "Scoring",
+    title: "Procurement scoring",
+    desc: "Weighted score per supplier: price 40%, delivery 25%, certifications 20%, reliability 15%. Results are ranked and saved as a report.",
+    isNew: true,
+  },
 ];
 
 const HowItWorks = () => {
@@ -37,10 +74,10 @@ const HowItWorks = () => {
   }, []);
 
   return (
-    <section 
-    id="how"
-    className="w-full flex flex-col items-center py-24 px-6">
-
+    <section
+      id="how"
+      className="w-full flex flex-col items-center py-24 px-6"
+    >
       {/* Eyebrow */}
       <p className="font-mono text-[11px] tracking-[.12em] uppercase text-gray-500 mb-3">
         Pipeline
@@ -88,7 +125,23 @@ const HowItWorks = () => {
               </div>
 
               {/* Card */}
-              <div className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl p-4 hover:bg-white/[0.07] hover:border-white/[0.14] transition-all duration-200 cursor-pointer">
+              <div
+                className={`
+                  relative flex-1 border rounded-xl p-4
+                  transition-all duration-200 cursor-pointer
+                  ${step.isNew
+                    ? "bg-white/[0.06] border-blue-500/25 hover:bg-white/[0.09] hover:border-blue-500/40"
+                    : "bg-white/[0.04] border-white/[0.08] hover:bg-white/[0.07] hover:border-white/[0.14]"
+                  }
+                `}
+              >
+                {/* "New" badge */}
+                {step.isNew && (
+                  <span className="absolute -top-px right-3 bg-blue-500 text-white font-mono text-[9px] tracking-widest uppercase px-2 py-0.5 rounded-b-md">
+                    New
+                  </span>
+                )}
+
                 <div className="flex items-center gap-2.5 mb-2">
                   <span className="text-base leading-none">{step.icon}</span>
                   <span className="font-mono text-[10px] tracking-[.04em] text-gray-500 bg-white/[0.05] border border-white/[0.08] px-2 py-0.5 rounded">

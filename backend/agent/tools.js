@@ -1,6 +1,7 @@
 import Supplier from "../models/supplier.model.js";
 import Quote from "../models/quote.model.js";
 import Search from "../models/search.model.js";
+import { discoverSuppliersOnWeb } from "./webDiscovery.js";
 
 // ─── TOOL 1 : Recherche de fournisseurs ───────────────────────────────────────
 export async function searchSuppliers({ component_type, power, protection, standard }) {
@@ -128,4 +129,9 @@ export async function assessRisk({ supplier_ids }) {
     });
 
     return results;
+}
+
+
+export async function webDiscoverSuppliers({ component_type, region, standards }) {
+    return await discoverSuppliersOnWeb({ component_type, region, standards });
 }

@@ -4,7 +4,8 @@ import {
     searchSuppliers,
     comparePrices,
     checkCertifications,
-    assessRisk
+    assessRisk,
+    webDiscoverSuppliers,
 } from "./tools.js";
 import { calculateProcurementScores } from "./scoring.js";
 import Report from "../models/report.model.js";
@@ -48,7 +49,7 @@ const toolDefinitions = [
                     description: "Power rating extracted from user message. Examples: 15kW, 7.5kW, 100HP, 200W"
                 },
                 protection: {
-                    type: "string",
+                    type: "string",  
                     description: "IP protection index. Examples: IP55, IP65, IP67, IP68"
                 },
                 standard: {
@@ -60,12 +61,46 @@ const toolDefinitions = [
         }
     },
     {
+        name: "discoverSuppliersOnWeb",
+        description: `
+            Search the web to discover NEW industrial suppliers not yet in MongoDB.
+
+            Call this tool AFTER searchSuppliers to expand the supplier pool.
+            Uses Tavily search + web scraping + Gemini extraction to find real suppliers.
+            Automatically saves discovered suppliers to MongoDB.
+            Returns supplier profiles ready for comparePrices, checkCertifications, assessRisk.
+
+            ALWAYS call this tool — even if searchSuppliers already returned results.
+            Combine IDs from both searchSuppliers AND discoverSuppliersOnWeb for steps 3-5.
+        `,
+        parameters: {
+            type: "object",
+            properties: {
+                component_type: {
+                    type: "string",
+                    description: "Component type in snake_case: electric_motor, hydraulic_pump, etc."
+                },
+                region: {
+                    type: "string",
+                    description: "Target deployment region: Europe, North America, Asia, etc."
+                },
+                standards: {
+                    type: "array",
+                    items: { type: "string" },
+                    description: "Required standards to include in search: CE, IEC, UL, NEMA, etc."
+                }
+            },
+            required: ["component_type", "region"]
+        }
+    },
+    {
         name: "comparePrices",
         description: `
             Retrieve and compare price quotes from MongoDB for a specific 
             list of suppliers.
 
-            Use this tool AFTER searchSuppliers returns supplier IDs.
+            Use this tool AFTER searchSuppliers AND discoverSuppliersOnWeb.
+            Use ALL supplier IDs from both tools combined.
 
             Analyzes:
             - Individual price per supplier
@@ -80,7 +115,7 @@ const toolDefinitions = [
                 supplier_ids: {
                     type: "array",
                     items: { type: "string" },
-                    description: "Array of MongoDB supplier _id strings returned by searchSuppliers"
+                    description: "Array of MongoDB supplier _id strings — combine IDs from searchSuppliers AND discoverSuppliersOnWeb"
                 }
             },
             required: ["supplier_ids"]
@@ -92,7 +127,8 @@ const toolDefinitions = [
             Verify whether suppliers hold the certifications and compliance 
             standards required for the user's industrial context.
 
-            Use this tool AFTER searchSuppliers.
+            Use this tool AFTER searchSuppliers AND discoverSuppliersOnWeb.
+            Use ALL supplier IDs from both tools combined.
 
             Infer required certifications from context:
             - European market          → always require CE
@@ -110,7 +146,7 @@ const toolDefinitions = [
                 supplier_ids: {
                     type: "array",
                     items: { type: "string" },
-                    description: "Array of MongoDB supplier _id strings"
+                    description: "Array of MongoDB supplier _id strings — combine IDs from searchSuppliers AND discoverSuppliersOnWeb"
                 },
                 required_certs: {
                     type: "array",
@@ -132,7 +168,8 @@ const toolDefinitions = [
             their country of origin, reliability rating, delivery performance,
             and historical data stored in MongoDB.
 
-            Use this tool AFTER searchSuppliers.
+            Use this tool AFTER searchSuppliers AND discoverSuppliersOnWeb.
+            Use ALL supplier IDs from both tools combined.
 
             Risk factors analyzed:
             - Geopolitical risk by country
@@ -149,7 +186,7 @@ const toolDefinitions = [
                 supplier_ids: {
                     type: "array",
                     items: { type: "string" },
-                    description: "Array of MongoDB supplier _id strings"
+                    description: "Array of MongoDB supplier _id strings — combine IDs from searchSuppliers AND discoverSuppliersOnWeb"
                 }
             },
             required: ["supplier_ids"]
@@ -169,6 +206,9 @@ async function executeTool(toolName, toolArgs) {
     switch (toolName) {
         case "searchSuppliers":
             result = await searchSuppliers(toolArgs);
+            break;
+        case "discoverSuppliersOnWeb":
+            result = await webDiscoverSuppliers(toolArgs);
             break;
         case "comparePrices":
             result = await comparePrices(toolArgs);
@@ -199,15 +239,17 @@ TOOL USAGE RULES
 ════════════════════════════════════════════════════════
 
 MANDATORY sequence for every procurement request:
-  Step 1 → searchSuppliers      (find candidates)
-  Step 2 → comparePrices        (use IDs from step 1)
-  Step 3 → checkCertifications  (use IDs from step 1, infer required certs)
-  Step 4 → assessRisk           (use IDs from step 1)
-  Step 5 → Generate final JSON response (ONLY after all 4 tools complete)
+  Step 1 → searchSuppliers          (search existing MongoDB suppliers)
+  Step 2 → discoverSuppliersOnWeb   (discover NEW suppliers from the web — ALWAYS call)
+  Step 3 → comparePrices            (use IDs from steps 1 + 2 combined)
+  Step 4 → checkCertifications      (use IDs from steps 1 + 2 combined)
+  Step 5 → assessRisk               (use IDs from steps 1 + 2 combined)
+  Step 6 → Generate final JSON response (ONLY after all 5 tools complete)
 
-NEVER generate a response without running ALL 4 tools first.
+NEVER generate a response without running ALL 5 tools first.
+NEVER skip discoverSuppliersOnWeb — it enriches the analysis with real market data.
 NEVER invent supplier data — only use what the tools return.
-NEVER skip certifications check — it is a legal compliance requirement.
+For steps 3-5, always combine supplier IDs from BOTH searchSuppliers and discoverSuppliersOnWeb.
 
 ════════════════════════════════════════════════════════
 CERTIFICATION INFERENCE RULES
@@ -225,7 +267,7 @@ CERTIFICATION INFERENCE RULES
 FINAL RESPONSE FORMAT
 ════════════════════════════════════════════════════════
 
-After ALL 4 tools have been executed, respond with a single valid JSON object.
+After ALL 5 tools have been executed, respond with a single valid JSON object.
 No markdown, no backticks, no preamble — pure JSON only.
 
 {
@@ -272,8 +314,8 @@ No markdown, no backticks, no preamble — pure JSON only.
     }
   ],
   "market_insights": [
-    "observation 1 derived from the data — e.g. European suppliers are 18% more expensive but deliver 2x faster",
-    "observation 2 — e.g. Only 2 out of 5 suppliers hold ATEX in this dataset"
+    "observation 1 derived from the data",
+    "observation 2 derived from the data"
   ],
   "price_analysis": {
     "min": number,
@@ -309,7 +351,7 @@ export async function runProcurementAgent(userMessage) {
         generationConfig: {
             temperature: 0.2,
             topP: 0.8,
-            maxOutputTokens: 8192    // increased for richer structured JSON
+            maxOutputTokens: 8192
         }
     });
 
@@ -322,7 +364,7 @@ export async function runProcurementAgent(userMessage) {
 
     let currentMessage = userMessage;
     let iterations     = 0;
-    const MAX_ITERATIONS = 10;
+    const MAX_ITERATIONS = 12; // augmenté pour les 5 tools
 
     // ─── Function Calling Loop ─────────────────────────────────────────────────
 
@@ -344,23 +386,21 @@ export async function runProcurementAgent(userMessage) {
 
             const rawText = textParts.map(p => p.text).join("");
 
-            // Parse structured JSON from Gemini
             let structuredAnalysis = null;
-        try {
-    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No JSON object found");
-    
-    structuredAnalysis = JSON.parse(jsonMatch[0]);
-    console.log("\n📋 Structured analysis parsed successfully");
-    console.log("   Keys found:", Object.keys(structuredAnalysis));
-} catch (e) {
-    console.error("⚠️  Parse error:", e.message);
-    console.error("⚠️  rawText length:", rawText.length);
-    console.error("⚠️  rawText end (last 300 chars):", rawText.slice(-300)); // ← fin du texte
-    structuredAnalysis = { raw: rawText };
-}
+            try {
+                const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+                if (!jsonMatch) throw new Error("No JSON object found");
+                structuredAnalysis = JSON.parse(jsonMatch[0]);
+                console.log("\n📋 Structured analysis parsed successfully");
+                console.log("   Keys found:", Object.keys(structuredAnalysis));
+            } catch (e) {
+                console.error("⚠️  Parse error:", e.message);
+                console.error("⚠️  rawText length:", rawText.length);
+                console.error("⚠️  rawText tail:", rawText.slice(-300));
+                structuredAnalysis = { raw: rawText };
+            }
 
-            // Procurement scores (computed locally, not by Gemini)
+            // ── Procurement scores ─────────────────────────────────────────────
             let scores = [];
             if (suppliersResult && pricesResult && certificationsResult && risksResult) {
                 scores = calculateProcurementScores(
@@ -371,22 +411,19 @@ export async function runProcurementAgent(userMessage) {
                 );
                 console.log(`\n📊 Procurement Scores:`);
                 scores.forEach(s => {
-                    console.log(`   ${s.supplier_name.padEnd(20)} → ${s.score}/100`);
+                    console.log(`   ${s.supplier_name.padEnd(25)} → ${s.score}/100`);
                 });
 
-                // Inject computed scores into structuredAnalysis for frontend use
                 if (structuredAnalysis && !structuredAnalysis.raw) {
                     structuredAnalysis.scores = scores;
-
-                    // Sync recommendation score with computed value
                     if (structuredAnalysis.recommendation && scores[0]) {
-                        structuredAnalysis.recommendation.score      = scores[0].score;
+                        structuredAnalysis.recommendation.score        = scores[0].score;
                         structuredAnalysis.recommendation.top_supplier = scores[0].supplier_name;
                     }
                 }
             }
 
-            // Save report to MongoDB
+            // ── Save report to MongoDB ─────────────────────────────────────────
             if (scores.length > 0) {
                 try {
                     await Report.create({
@@ -422,16 +459,19 @@ export async function runProcurementAgent(userMessage) {
             return {
                 success: true,
                 query:    userMessage,
-                analysis: structuredAnalysis,   // full structured JSON for frontend
+                analysis: structuredAnalysis,
                 metadata: {
-                    iterations_used: iterations,
-                    tools_called:    4,
-                    timestamp:       new Date().toISOString()
+                    iterations_used:    iterations,
+                    tools_called:       5,
+                    suppliers_from_db:  suppliersResult?.filter(s => !s.source)?.length   || 0,
+                    suppliers_from_web: suppliersResult?.filter(s => s.source)?.length    || 0,
+                    total_suppliers:    suppliersResult?.length                            || 0,
+                    timestamp:          new Date().toISOString()
                 }
             };
         }
 
-        // ── Execute tool calls and send results back to Gemini ─────────────────
+        // ── Execute tool calls ─────────────────────────────────────────────────
 
         const toolResults = [];
 
@@ -439,10 +479,31 @@ export async function runProcurementAgent(userMessage) {
             const { name, args } = part.functionCall;
             const result = await executeTool(name, args);
 
-            if (name === "searchSuppliers")     suppliersResult      = result;
-            if (name === "comparePrices")        pricesResult         = result;
-            if (name === "checkCertifications")  certificationsResult = result;
-            if (name === "assessRisk")           risksResult          = result;
+            // ── Capture et fusion des résultats ────────────────────────────────
+            if (name === "searchSuppliers") {
+                suppliersResult = result;
+                console.log(`   📦 MongoDB suppliers: ${result.length}`);
+            }
+
+            if (name === "discoverSuppliersOnWeb") {
+                const existing = suppliersResult || [];
+                const merged   = [...existing, ...result];
+
+                // Déduplication par nom
+                const seen = new Set();
+                suppliersResult = merged.filter(s => {
+                    if (seen.has(s.name)) return false;
+                    seen.add(s.name);
+                    return true;
+                });
+
+                console.log(`   🌐 Web suppliers discovered: ${result.length}`);
+                console.log(`   🔀 Total after merge: ${suppliersResult.length}`);
+            }
+
+            if (name === "comparePrices")       pricesResult         = result;
+            if (name === "checkCertifications") certificationsResult = result;
+            if (name === "assessRisk")          risksResult          = result;
 
             toolResults.push({
                 functionResponse: {

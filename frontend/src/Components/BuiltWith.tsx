@@ -51,6 +51,20 @@ const TECH_STACK = [
       "Function-calling LLM responsible for procurement analysis and supplier recommendations.",
   },
   {
+    name: "Tavily",
+    category: "Web Search",
+    description:
+      "AI-optimized search API that discovers real industrial suppliers across the web beyond the existing database.",
+    isNew: true,
+  },
+  {
+    name: "Cheerio",
+    category: "Web Scraping",
+    description:
+      "HTML parser that extracts supplier data — name, country, certifications, delivery times — directly from manufacturer websites.",
+    isNew: true,
+  },
+  {
     name: "Docker",
     category: "Infrastructure",
     description:
@@ -78,16 +92,26 @@ const TechCard = ({
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, margin: "-50px" }}
     transition={{ duration: 0.45, delay: (index % 5) * 0.05 }}
-    className="
-      bg-white/[0.025]
-      border border-white/[0.08]
+    className={`
+      relative
+      border
       rounded-2xl
       p-5
-      hover:bg-white/[0.04]
       transition-colors
       duration-200
-    "
+      ${
+        (tech as any).isNew
+          ? "bg-blue-500/[0.06] border-blue-500/25 hover:bg-blue-500/[0.10]"
+          : "bg-white/[0.025] border-white/[0.08] hover:bg-white/[0.04]"
+      }
+    `}
   >
+    {(tech as any).isNew && (
+      <span className="absolute -top-px right-3 bg-blue-500 text-white font-mono text-[9px] tracking-widest uppercase px-2 py-0.5 rounded-b-md">
+        New
+      </span>
+    )}
+
     <p
       className="
         text-[10px]
@@ -118,13 +142,11 @@ const BuiltWith = () => (
     className="w-full flex flex-col items-center py-20 px-4"
   >
     {/* Eyebrow */}
-
     <p className="font-mono text-[11px] tracking-[.12em] uppercase text-gray-500 mb-3">
       Built With
     </p>
 
     {/* Title */}
-
     <h2 className="text-3xl md:text-4xl font-semibold text-gray-100 text-center leading-tight max-w-3xl">
       Modern technologies powering SupplyPilot
     </h2>
@@ -136,8 +158,7 @@ const BuiltWith = () => (
     </p>
 
     {/* Grid */}
-
-    <div className="mt-14 w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div className="mt-14 w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {TECH_STACK.map((tech, index) => (
         <TechCard
           key={tech.name}
@@ -148,7 +169,6 @@ const BuiltWith = () => (
     </div>
 
     {/* Architecture */}
-
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -197,14 +217,28 @@ const BuiltWith = () => (
 
         <div className="text-white/20">↓</div>
 
-        <div className="grid grid-cols-2 gap-10">
+        <div className="grid grid-cols-3 gap-6">
           <div className="text-white/70 text-sm">
             MongoDB Supplier Database
           </div>
-
+          <div className="flex flex-col items-center gap-1">
+            <div className="text-blue-400/80 text-sm font-medium">
+              Tavily Search
+            </div>
+            <div className="text-white/20 text-xs">↓</div>
+            <div className="text-blue-400/80 text-sm font-medium">
+              Cheerio Scraping
+            </div>
+          </div>
           <div className="text-white/70 text-sm">
             Risk & Compliance Engine
           </div>
+        </div>
+
+        <div className="text-white/20">↓</div>
+
+        <div className="text-white/70 text-sm font-medium">
+          Procurement Scoring (price 40% · delivery 25% · certs 20% · reliability 15%)
         </div>
 
         <div className="text-white/20">↓</div>
@@ -216,7 +250,6 @@ const BuiltWith = () => (
     </motion.div>
 
     {/* Tech Tags */}
-
     <div className="mt-10 flex flex-wrap justify-center gap-2 max-w-4xl">
       {[
         "React",
@@ -225,6 +258,8 @@ const BuiltWith = () => (
         "Express",
         "MongoDB",
         "Gemini",
+        "Tavily",
+        "Cheerio",
         "Docker",
         "Tailwind CSS",
         "Framer Motion",
@@ -232,16 +267,18 @@ const BuiltWith = () => (
       ].map((tech) => (
         <span
           key={tech}
-          className="
+          className={`
             px-3
             py-1.5
             rounded-full
-            bg-white/[0.03]
-            border
-            border-white/[0.08]
-            text-white/55
             text-xs
-          "
+            border
+            ${
+              tech === "Tavily" || tech === "Cheerio"
+                ? "bg-blue-500/[0.08] border-blue-500/25 text-blue-400/70"
+                : "bg-white/[0.03] border-white/[0.08] text-white/55"
+            }
+          `}
         >
           {tech}
         </span>
@@ -249,7 +286,6 @@ const BuiltWith = () => (
     </div>
 
     {/* Footer Note */}
-
     <p className="mt-8 text-center text-white/30 text-[12px] max-w-2xl leading-relaxed">
       Built using a modern full-stack architecture designed for scalability,
       explainability, and future integration into enterprise procurement

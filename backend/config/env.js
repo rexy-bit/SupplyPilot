@@ -7,6 +7,7 @@ export const {
     PORT,
     NODE_ENV,
     DB_URI,
-    GEMINI_API_KEY
+    GEMINI_API_KEY,
+    TAVILY_API_KEY 
 } = process.env;
 
