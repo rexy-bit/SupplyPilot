@@ -6,3 +6,6 @@ dist
 .git
 .gitignore
 README.md
+.env.development.local
+.env.production.local
+.env

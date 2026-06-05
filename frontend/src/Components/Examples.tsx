@@ -484,7 +484,7 @@ const Examples = () => {
   const [selected, setSelected] = useState<AgentTestVector | null>(null);
 
   return (
-    <section id="results" className="w-full flex flex-col items-center py-20 px-4">
+    <section id="examples" className="w-full flex flex-col items-center py-20 px-4">
 
       {/* Eyebrow */}
       <p className="font-mono text-[11px] tracking-[.12em] uppercase text-gray-500 mb-3">
